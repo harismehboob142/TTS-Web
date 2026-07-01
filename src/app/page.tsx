@@ -7,6 +7,8 @@ const VOICES = [
   "Rosie", "Hugo", "Kiki", "Leo",
 ];
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [text, setText] = useState("");
@@ -29,7 +31,7 @@ export default function Home() {
     setLoading(true);
     setAudioUrl(null);
     try {
-      const res = await fetch("/api/synthesize", {
+      const res = await fetch(`${API_BASE}/api/synthesize`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text, voice, speed }),
