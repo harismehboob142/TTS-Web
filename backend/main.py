@@ -1,4 +1,10 @@
-from fastapi import FastAPI, Query
+import os
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+from fastapi import FastAPI
 from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -6,6 +12,10 @@ from kittentts import KittenTTS
 import io
 import soundfile as sf
 import numpy as np
+
+logger.info("Loading model...")
+model = KittenTTS("KittenML/kitten-tts-mini-0.8")
+logger.info("Model loaded successfully")
 
 app = FastAPI(title="Kitten TTS API")
 
@@ -16,13 +26,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-model = KittenTTS("KittenML/kitten-tts-mini-0.8")
-
 
 class SynthesizeRequest(BaseModel):
     text: str
     voice: str = "Jasper"
     speed: float = 1.0
+
+
+@app.get("/")
+def root():
+    return {"status": "ok"}
 
 
 @app.get("/api/voices")
@@ -41,4 +54,5 @@ def synthesize(req: SynthesizeRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
