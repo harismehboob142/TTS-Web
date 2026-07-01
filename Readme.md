@@ -1,204 +1,178 @@
-# Kitten TTS
+# TTS Web
 
-<p align="center">
-  <img width="607" height="255" alt="Kitten TTS" src="https://github.com/user-attachments/assets/f4646722-ba78-4b25-8a65-81bacee0d4f6" />
-</p>
-
-<p align="center">
-  <a href="https://huggingface.co/spaces/KittenML/KittenTTS-Demo"><img src="https://img.shields.io/badge/Demo-Hugging%20Face%20Spaces-orange" alt="Hugging Face Demo"></a>
-  <a href="https://discord.com/invite/VJ86W4SURW"><img src="https://img.shields.io/badge/Discord-Join%20Community-5865F2?logo=discord&logoColor=white" alt="Discord"></a>
-  <a href="https://kittenml.com"><img src="https://img.shields.io/badge/Website-kittenml.com-blue" alt="Website"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-green.svg" alt="License"></a>
-</p>
-
-> **New:** Kitten TTS v0.8 is out -- 15M, 40M, and 80M parameter models now available.
-
-Kitten TTS is an open-source, lightweight text-to-speech library built on ONNX. With models ranging from 15M to 80M parameters (25-80 MB on disk), it delivers high-quality voice synthesis on CPU without requiring a GPU.
-
-> **Status:** Developer preview -- APIs may change between releases.
-
-**Commercial support is available.** For integration assistance, custom voices, or enterprise licensing, [contact us](https://docs.google.com/forms/d/e/1FAIpQLSc49erSr7jmh3H2yeqH4oZyRRuXm0ROuQdOgWguTzx6SMdUnQ/viewform?usp=preview).
-
-## Table of Contents
-
-- [Features](#features)
-- [Available Models](#available-models)
-- [Demo](#demo)
-- [Quick Start](#quick-start)
-- [API Reference](#api-reference)
-- [System Requirements](#system-requirements)
-- [Roadmap](#roadmap)
-- [Commercial Support](#commercial-support)
-- [Community and Support](#community-and-support)
-- [License](#license)
+A web interface for [Kitten TTS](https://github.com/KittenML/KittenTTS) — an ultra-lightweight text-to-speech model that runs on CPU. Built with a Next.js frontend and FastAPI Python backend.
 
 ## Features
 
-- **Ultra-lightweight** -- Model sizes from 25 MB (int8) to 80 MB, suitable for edge deployment
-- **CPU-optimized** -- ONNX-based inference runs efficiently without a GPU
-- **8 built-in voices** -- Bella, Jasper, Luna, Bruno, Rosie, Hugo, Kiki, and Leo
-- **Adjustable speech speed** -- Control playback rate via the `speed` parameter
-- **Text preprocessing** -- Built-in pipeline handles numbers, currencies, units, and more
-- **24 kHz output** -- High-quality audio at a standard sample rate
+- **8 voices** — Bella, Jasper, Luna, Bruno, Rosie, Hugo, Kiki, Leo
+- **Adjustable speed** — 0.5x to 2.0x
+- **Audio playback & download** — listen or save as WAV
+- **Share to WhatsApp** — share audio on mobile
+- **CPU-only** — no GPU required
+- **ONNX-based** — fast inference with onnxruntime
 
-## Available Models
+## Project Structure
 
-| Model | Parameters | Size | Download |
-|---|---|---|---|
-| kitten-tts-mini | 80M | 80 MB | [KittenML/kitten-tts-mini-0.8](https://huggingface.co/KittenML/kitten-tts-mini-0.8) |
-| kitten-tts-micro | 40M | 41 MB | [KittenML/kitten-tts-micro-0.8](https://huggingface.co/KittenML/kitten-tts-micro-0.8) |
-| kitten-tts-nano | 15M | 56 MB | [KittenML/kitten-tts-nano-0.8](https://huggingface.co/KittenML/kitten-tts-nano-0.8-fp32) |
-| kitten-tts-nano (int8) | 15M | 25 MB | [KittenML/kitten-tts-nano-0.8-int8](https://huggingface.co/KittenML/kitten-tts-nano-0.8-int8) |
+```
+├── backend/            # FastAPI Python server
+│   ├── main.py         # API endpoints
+│   ├── Dockerfile      # Container build
+│   └── requirements.txt
+├── frontend/           # Next.js web app
+│   ├── src/app/        # React components
+│   ├── next.config.ts
+│   └── package.json
+├── start.sh            # Launch both servers
+└── .env                # HF_TOKEN (optional)
+```
 
-> **Note:** Some users have reported issues with the `kitten-tts-nano-0.8-int8` model. If you encounter problems, please [open an issue](https://github.com/KittenML/KittenTTS/issues).
+## Prerequisites
 
-## Demo
+| Tool | Version | Install |
+|------|---------|---------|
+| Python | 3.8 – 3.12 | [python.org](https://python.org) |
+| Node.js | 18+ | [nodejs.org](https://nodejs.org) |
+| npm | (comes with Node.js) | — |
+| Git | (optional) | [git-scm.com](https://git-scm.com) |
 
-https://github.com/user-attachments/assets/d80120f2-c751-407e-a166-068dd1dd9e8d
+## Setup
 
-### Try it online
-
-Try Kitten TTS directly in your browser on [Hugging Face Spaces](https://huggingface.co/spaces/KittenML/KittenTTS-Demo).
-
-## Quick Start
-
-### Prerequisites
-
-- Python 3.8 or later
-- pip
-
-### Installation
+### 1. Clone the repo
 
 ```bash
-pip install https://github.com/KittenML/KittenTTS/releases/download/0.8.1/kittentts-0.8.1-py3-none-any.whl
+git clone https://github.com/harismehboob142/TTS-Web.git
+cd TTS-Web
 ```
 
-### Basic Usage
+### 2. Backend setup
 
-```python
-from kittentts import KittenTTS
+Create a virtual environment and install dependencies:
 
-model = KittenTTS("KittenML/kitten-tts-mini-0.8")
-audio = model.generate("This high-quality TTS model runs without a GPU.", voice="Jasper")
-
-import soundfile as sf
-sf.write("output.wav", audio, 24000)
+**Linux / macOS:**
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r backend/requirements.txt
 ```
 
-### Advanced Usage
-
-```python
-# Adjust speech speed (default: 1.0)
-audio = model.generate("Hello, world.", voice="Luna", speed=1.2)
-
-# Save directly to a file
-model.generate_to_file("Hello, world.", "output.wav", voice="Bruno", speed=0.9)
-
-# List available voices
-print(model.available_voices)
-# ['Bella', 'Jasper', 'Luna', 'Bruno', 'Rosie', 'Hugo', 'Kiki', 'Leo']
+**Windows (PowerShell):**
+```powershell
+python -m venv venv
+venv\Scripts\activate
+pip install -r backend\requirements.txt
 ```
 
-### Using with GPU
+> If you get a `misaki` dependency error about Python version, run:
+> ```bash
+> pip install --ignore-requires-python "misaki[en]>=0.9.4"
+> ```
 
-```
-pip install -r requirements_gpu.txt
-```
+### 3. Frontend setup
 
-```python
-m = KittenTTS("KittenML/kitten-tts-mini-0.8", backend="cuda")
-```
-
-Check out `example_cuda.py` 
-
-## API Reference
-
-### `KittenTTS(model_name, cache_dir=None)`
-
-Load a model from Hugging Face Hub.
-
-| Parameter | Type | Default | Description |
-|---|---|---|---|
-| `model_name` | `str` | `"KittenML/kitten-tts-nano-0.8"` | Hugging Face repository ID |
-| `cache_dir` | `str` | `None` | Local directory for caching downloaded model files |
-
-### `model.generate(text, voice, speed, clean_text)`
-
-Synthesize speech from text, returning a NumPy array of audio samples at 24 kHz.
-
-| Parameter | Type | Default | Description |
-|---|---|---|---|
-| `text` | `str` | -- | Input text to synthesize |
-| `voice` | `str` | `"expr-voice-5-m"` | Voice name (see available voices) |
-| `speed` | `float` | `1.0` | Speech speed multiplier |
-| `clean_text` | `bool` | `False` | Preprocess text (expand numbers, currencies, etc.) |
-
-### `model.generate_to_file(text, output_path, voice, speed, sample_rate, clean_text)`
-
-Synthesize speech and write directly to an audio file.
-
-| Parameter | Type | Default | Description |
-|---|---|---|---|
-| `text` | `str` | -- | Input text to synthesize |
-| `output_path` | `str` | -- | Path to save the audio file |
-| `voice` | `str` | `"expr-voice-5-m"` | Voice name |
-| `speed` | `float` | `1.0` | Speech speed multiplier |
-| `sample_rate` | `int` | `24000` | Audio sample rate in Hz |
-| `clean_text` | `bool` | `True` | Preprocess text (expand numbers, currencies, etc.) |
-
-### `normalize_text(text, locale="en-US", return_spans=False)`
-
-Normalize text for TTS without generating audio.
-
-```python
-from kittentts import normalize_text
-
-normalized = normalize_text("Dr. Rivera paid $12.50 at 3:05 p.m.")
-# "Doctor Rivera paid twelve dollars and fifty cents at three oh five p m."
-
-result = normalize_text("Fig. 2", return_spans=True)
-print(result.text)
-print(result.spans)
+```bash
+cd frontend
+npm install
+cd ..
 ```
 
-When `return_spans=True`, the result includes original-to-normalized character spans for changed segments such as abbreviations, dates, times, numbers, currency, URLs, and punctuation.
+### 4. Environment variables (optional)
 
-### `model.available_voices`
+Create a `.env` file in the project root:
 
-Returns a list of available voice names: `['Bella', 'Jasper', 'Luna', 'Bruno', 'Rosie', 'Hugo', 'Kiki', 'Leo']`
+```env
+HF_TOKEN=hf_your_token_here
+```
 
-## System Requirements
+This avoids Hugging Face rate limit warnings when downloading the model. Get a free token at [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens).
 
-- **Operating system:** Linux, macOS, or Windows
-- **Python:** 3.8 or later
-- **Hardware:** Runs on CPU; no GPU required
-- **Disk space:** 25-80 MB depending on model variant
+For local development, create `frontend/.env.local`:
 
-A virtual environment (conda, venv, or similar) is recommended to avoid dependency conflicts.
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
 
-## Roadmap
+## Running locally
 
-- [ ] Release optimized inference engine
-- [ ] Release mobile SDK
-- [ ] Release higher quality TTS models
-- [ ] Release multilingual TTS
-- [ ] Release KittenASR
-- [ ] Need anything else? [Let us know](https://github.com/KittenML/KittenTTS/issues)
+### One-command start (Linux / macOS)
 
-## Commercial Support
+```bash
+chmod +x start.sh
+./start.sh
+```
 
-We offer commercial support for teams integrating Kitten TTS into their products. This includes integration assistance, custom voice development, and enterprise licensing.
+### Manual start (all OS)
 
-[Contact us](https://docs.google.com/forms/d/e/1FAIpQLSc49erSr7jmh3H2yeqH4oZyRRuXm0ROuQdOgWguTzx6SMdUnQ/viewform?usp=preview) or email info@stellonlabs.com to discuss your requirements.
+**Terminal 1 — Backend:**
+```bash
+# Linux / macOS
+source venv/bin/activate
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 
-## Community and Support
+# Windows PowerShell
+venv\Scripts\activate
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
+```
 
-- **Discord:** [Join the community](https://discord.com/invite/VJ86W4SURW)
-- **Website:** [kittenml.com](https://kittenml.com)
-- **Custom support:** [Request form](https://docs.google.com/forms/d/e/1FAIpQLSc49erSr7jmh3H2yeqH4oZyRRuXm0ROuQdOgWguTzx6SMdUnQ/viewform?usp=preview)
-- **Email:** info@stellonlabs.com
-- **Issues:** [GitHub Issues](https://github.com/KittenML/KittenTTS/issues)
+**Terminal 2 — Frontend:**
+```bash
+cd frontend
+npm run dev
+```
 
-## License
+Open **http://localhost:3000** in your browser.
 
-This project is licensed under the [Apache License 2.0](LICENSE).
+## Usage
+
+1. Type or paste text into the text area
+2. Choose a voice from the dropdown
+3. Adjust speed with the slider
+4. Click **Generate Speech**
+5. Play, download, or share the audio
+
+## Deploying
+
+### Frontend → Vercel
+
+```bash
+cd frontend
+npx vercel --prod
+```
+
+Set environment variable in Vercel dashboard:
+- `NEXT_PUBLIC_API_URL` = your backend URL
+
+Set **Root Directory** to `frontend/` in Vercel project settings.
+
+### Backend → Railway
+
+1. Push repo to GitHub
+2. Create a new Railway project → **Deploy from GitHub**
+3. Set **Root Directory** to `backend/`
+4. Add environment variable: `HF_TOKEN` = your Hugging Face token
+5. Railway auto-detects the Dockerfile
+
+## API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/voices` | List available voices |
+| POST | `/api/synthesize` | Generate speech from text |
+
+### POST `/api/synthesize`
+
+```json
+{
+  "text": "Hello world.",
+  "voice": "Jasper",
+  "speed": 1.0
+}
+```
+
+Returns a WAV audio file.
+
+## Tech Stack
+
+- **Frontend:** Next.js, React, TypeScript, Tailwind CSS
+- **Backend:** FastAPI, Python, ONNX Runtime
+- **Model:** Kitten TTS (80M or 15M params)
+- **Deployment:** Vercel (frontend), Railway (backend)
