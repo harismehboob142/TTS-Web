@@ -1,0 +1,11 @@
+https://github.com/KittenML/KittenTTS/releases/download/0.8.1/kittentts-0.8.1-py3-none-any.whl
+fastapi
+soundfile
+numpy
+misaki[en]>=0.9.4
+phonemizer-fork
+espeakng_loader
+spacy
+num2words
+huggingface_hub
+onnxruntime
