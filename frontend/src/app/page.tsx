@@ -69,7 +69,7 @@ export default function Home() {
             😸️ Pussy Text to Speech Model
           </h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-            80M parameter model — CPU only
+            15M parameter model — CPU only
           </p>
         </div>
 

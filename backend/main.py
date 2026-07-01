@@ -14,7 +14,7 @@ import soundfile as sf
 import numpy as np
 
 logger.info("Loading model...")
-model = KittenTTS("KittenML/kitten-tts-mini-0.8")
+model = KittenTTS("KittenML/kitten-tts-nano-0.8-int8")
 logger.info("Model loaded successfully")
 
 app = FastAPI(title="Kitten TTS API")
